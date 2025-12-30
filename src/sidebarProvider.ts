@@ -7,16 +7,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   private failedTests: any[] = [];
 
   resolveWebviewView(view: vscode.WebviewView) {
-    this.view = view; // ✅ THIS WAS MISSING
+    this.view = view;
 
-
-    // ✅ REQUIRED
     view.webview.options = {
       enableScripts: true
     };
     
-
-    // ✅ REGISTER HANDLER ONCE
     view.webview.onDidReceiveMessage(msg => {
       if (msg.command === 'configure') {
         vscode.commands.executeCommand(
@@ -42,7 +38,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     const config = vscode.workspace.getConfiguration('reporterplus');
     const reportPath = config.get<string>('reportJsonPath');
 
-    // State: no path configured
     if (!reportPath) {
       view.webview.html = this.renderMessage(
         'No report configured.',
@@ -172,6 +167,8 @@ private renderFailures(failedTests: any[]): string {
   }
 
   this.view.webview.html = this.renderFailures(this.failedTests);
+
+  
 }
 
 }

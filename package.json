@@ -6,9 +6,10 @@
   "engines": {
     "vscode": "^1.80.0"
   },
-  "activationEvents": [
-  "onStartupFinished"
-],
+ "activationEvents": [
+  "onView:reporterplus.sidebar",
+  "onCommand:reporterplus.configureReportPath"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [

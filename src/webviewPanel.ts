@@ -16,13 +16,11 @@ export function openReportWebview(extensionUri: vscode.Uri, reportPath: string) 
   // Read the report HTML from disk and serve via webview
   try {
     const html = fs.readFileSync(reportPath, 'utf8');
-    // If the HTML references local assets, you may need to rewrite paths to webview URIs.
     panel.webview.html = html;
   } catch (err) {
     panel.webview.html = `<html><body><h3>Could not open report</h3><pre>${err}</pre></body></html>`;
   }
 
-  // Example: handle clicks from the webview to jump to tests
   panel.webview.onDidReceiveMessage(msg => {
     if (msg.command === 'jumpToTest') {
       vscode.commands.executeCommand('reporterplus.jumpToTest', msg.file, msg.line);
