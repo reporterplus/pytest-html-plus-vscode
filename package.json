@@ -1,8 +1,15 @@
 {
-  "name": "reporterplus-vscode",
-  "displayName": "ReporterPlus",
-  "version": "0.0.1",
-  "publisher": "<your-publisher>",
+  "name": "pytest-html-plus-vscode",
+  "displayName": "Pytest HTML Plus",
+  "version": "0.1.0",
+  "publisher": "reporterplus",
+  "categories": ["Testing"],
+  "icon": "resources/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reporterplus/pytest-html-plus-vscode"
+  },
+  "description": "Show failed pytest tests in a VS Code sidebar and jump directly to failure locations.",
   "engines": {
     "vscode": "^1.80.0"
   },
