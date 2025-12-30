@@ -1,0 +1,63 @@
+{
+  "name": "reporterplus-vscode",
+  "displayName": "ReporterPlus",
+  "version": "0.0.1",
+  "publisher": "<your-publisher>",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "activationEvents": [
+  "onStartupFinished"
+],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+    "command": "reporterplus.configureReportPath",
+    "title": "ReporterPlus: Configure Report Path"
+  }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "reporterplus",
+          "title": "ReporterPlus",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+  "reporterplus": [
+    {
+      "id": "reporterplus.sidebar",
+      "name": "Failed Tests",
+      "type": "webview"
+    }
+  ]
+},
+    "configuration": {
+      "properties": {
+        "reporterplus.reportJsonPath": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to final_report.json"
+        },
+        "reporterplus.reportHtmlPath": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to ReporterPlus HTML report"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "@types/vscode": "^1.80.0",
+    "esbuild": "^0.18.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "tsc -watch -p ."
+  }
+}
