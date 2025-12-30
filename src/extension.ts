@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (!fs.existsSync(resolved)) {
           vscode.window.showErrorMessage(
-            `final_report.json not found at ${resolved}`
+            `final-report.json not found at ${resolved}`
           );
           return;
         }
@@ -75,6 +75,13 @@ export function activate(context: vscode.ExtensionContext) {
       }
     )
   );
+  context.subscriptions.push(
+  vscode.commands.registerCommand(
+    'reporterplus.refresh',
+    () => sidebarProvider.refresh()
+  )
+);
+
 }
 
 export function deactivate() {}

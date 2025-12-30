@@ -15,7 +15,12 @@
       {
     "command": "reporterplus.configureReportPath",
     "title": "ReporterPlus: Configure Report Path"
-  }
+  },
+  {
+  "command": "reporterplus.refresh",
+  "title": "ReporterPlus: Refresh"
+}
+
     ],
     "viewsContainers": {
       "activitybar": [
@@ -40,7 +45,7 @@
         "reporterplus.reportJsonPath": {
           "type": "string",
           "default": "",
-          "description": "Absolute path to final_report.json"
+          "description": "Absolute path to final-report.json"
         },
         "reporterplus.reportHtmlPath": {
           "type": "string",
