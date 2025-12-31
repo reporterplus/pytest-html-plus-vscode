@@ -1,0 +1,25 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Flask/test tube shape -->
+  <path d="M9 3V9.5L4 18.5C3.5 19.5 4.2 21 5.5 21H18.5C19.8 21 20.5 19.5 20 18.5L15 9.5V3" 
+        stroke="currentColor" 
+        stroke-width="1.5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  <!-- Top cap -->
+  <path d="M8 3H16" 
+        stroke="currentColor" 
+        stroke-width="1.5" 
+        stroke-linecap="round"/>
+  <!-- Liquid line -->
+  <path d="M6 16H18" 
+        stroke="currentColor" 
+        stroke-width="1.2" 
+        stroke-linecap="round"
+        opacity="0.5"/>
+  <!-- Result indicator (checkmark for passed tests) -->
+  <path d="M9 12L11 14L15 10" 
+        stroke="currentColor" 
+        stroke-width="1.5" 
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+</svg>
