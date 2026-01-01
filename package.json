@@ -1,7 +1,7 @@
 {
   "name": "pytest-html-plus-vscode",
   "displayName": "Pytest HTML Plus",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "reporterplus",
   "description": "View pytest test results in VS Code sidebar with one-click navigation to failures.",
   "categories": [
@@ -118,6 +118,6 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.80.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.9.3"
   }
 }
