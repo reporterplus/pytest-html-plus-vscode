@@ -2,6 +2,9 @@
 
 A VS Code extension that integrates with pytest-html-plus to surface test results directly inside VS Code. Get instant visibility into your test health with a clean, intuitive sidebar experience.
 
+<img width="1840" height="1728" alt="image" src="https://github.com/user-attachments/assets/6e86c016-cf17-4a77-8822-aa72efd607b6" />
+
+
 ## Features
 
 - **Test Summary** - Total, passed, failed, and skipped counts with visual progress bar
