@@ -3,74 +3,121 @@
   "displayName": "Pytest HTML Plus",
   "version": "0.1.0",
   "publisher": "reporterplus",
-  "categories": ["Testing"],
+  "description": "View pytest test results in VS Code sidebar with one-click navigation to failures.",
+  "categories": [
+    "Testing"
+  ],
+  "keywords": [
+    "pytest",
+    "python",
+    "testing",
+    "test results",
+    "pytest-html-plus"
+  ],
   "icon": "resources/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/reporterplus/pytest-html-plus-vscode"
   },
-  "description": "Show failed pytest tests in a VS Code sidebar and jump directly to failure locations.",
   "engines": {
     "vscode": "^1.80.0"
   },
- "activationEvents": [
-  "onView:reporterplus.sidebar",
-  "onCommand:reporterplus.configureReportPath"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-    "command": "reporterplus.configureReportPath",
-    "title": "ReporterPlus: Configure Report Path"
-  },
-  {
-  "command": "reporterplus.refresh",
-  "title": "ReporterPlus: Refresh"
-}
-
+        "command": "reporterplus.configureReportPath",
+        "title": "Configure Report Path",
+        "category": "Pytest HTML Plus",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "reporterplus.refresh",
+        "title": "Refresh Test Results",
+        "category": "Pytest HTML Plus",
+        "icon": "$(refresh)"
+      }
     ],
     "viewsContainers": {
       "activitybar": [
         {
           "id": "reporterplus",
-          "title": "ReporterPlus",
+          "title": "Pytest HTML Plus",
           "icon": "resources/icon.svg"
         }
       ]
     },
     "views": {
-  "reporterplus": [
-    {
-      "id": "reporterplus.sidebar",
-      "name": "Failed Tests",
-      "type": "webview"
-    }
-  ]
-},
+      "reporterplus": [
+        {
+          "id": "reporterplus.sidebar",
+          "name": "Test Results",
+          "type": "webview"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "reporterplus.refresh",
+          "when": "view == reporterplus.sidebar",
+          "group": "navigation@1"
+        },
+        {
+          "command": "reporterplus.configureReportPath",
+          "when": "view == reporterplus.sidebar",
+          "group": "navigation@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "reporterplus.configureReportPath",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "reporterplus.refresh",
+          "when": "workspaceFolderCount > 0"
+        }
+      ]
+    },
     "configuration": {
+      "title": "Pytest HTML Plus",
       "properties": {
         "reporterplus.reportJsonPath": {
           "type": "string",
           "default": "",
-          "description": "Absolute path to final-report.json"
+          "description": "Path to the pytest report JSON file (absolute or relative to workspace). Leave empty for auto-detection."
         },
-        "reporterplus.reportHtmlPath": {
-          "type": "string",
-          "default": "",
-          "description": "Absolute path to ReporterPlus HTML report"
+        "reporterplus.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh when the report file changes."
+        },
+        "reporterplus.showErrorSnippets": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show truncated error messages for failed tests."
+        },
+        "reporterplus.maxErrorLength": {
+          "type": "number",
+          "default": 150,
+          "minimum": 50,
+          "maximum": 500,
+          "description": "Maximum length of error snippets shown in the sidebar."
         }
       }
     }
   },
-  "devDependencies": {
-    "@types/node": "^25.0.3",
-    "@types/vscode": "^1.80.0",
-    "esbuild": "^0.18.0",
-    "typescript": "^5.0.0"
-  },
   "scripts": {
     "build": "tsc -p .",
-    "watch": "tsc -watch -p ."
+    "watch": "tsc -watch -p .",
+    "lint": "tsc --noEmit",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
   }
 }
