@@ -2,6 +2,8 @@
 
 A VS Code extension that integrates with pytest-html-plus to surface test results directly inside VS Code. Get instant visibility into your test health with a clean, intuitive sidebar experience.
 
+[![Docs](https://img.shields.io/badge/docs-online-blue)](https://pytest-html-plus.readthedocs.io/en/main/extensions/vscode/usage.html)
+
 <img width="1840" height="1728" alt="image" src="https://github.com/user-attachments/assets/6e86c016-cf17-4a77-8822-aa72efd607b6" />
 
 
@@ -18,7 +20,8 @@ A VS Code extension that integrates with pytest-html-plus to surface test result
 
 1. Run pytest with pytest-html-plus:
    ```bash
-   pytest --json-report --json-report-file=final_report.json
+   pip install pytest-html-plus or poetry add pytest-html-plus
+   pytest or pytest -n auto
    ```
 
 2. Open the sidebar by clicking the test flask icon in the Activity Bar
@@ -40,31 +43,6 @@ The extension automatically searches for `final_report.json` in common locations
 - `reporterplus.autoRefresh` - Auto-refresh on file changes (default: `true`)
 - `reporterplus.showErrorSnippets` - Show error messages (default: `true`)
 - `reporterplus.maxErrorLength` - Max characters for error snippets (default: `150`)
-
-## Supported Report Format
-
-The extension supports pytest-html-plus JSON format:
-
-```json
-{
-  "filters": {
-    "total": 45,
-    "passed": 42,
-    "failed": 3,
-    "skipped": 0
-  },
-  "results": [
-    {
-      "test": "test_name",
-      "nodeid": "tests/test_file.py::test_name",
-      "status": "failed",
-      "file": "tests/test_file.py",
-      "line": 15,
-      "error": "AssertionError: ..."
-    }
-  ]
-}
-```
 
 ## Commands
 
