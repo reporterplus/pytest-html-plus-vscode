@@ -37,4 +37,4 @@ export type SidebarState =
   | 'error'
   | 'loading';
 
-export type TestStatus = 'failed' | 'passed' | 'skipped';
+export type TestStatus = 'failed' | 'passed' | 'skipped' | 'error';
