@@ -142,7 +142,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           this.reportData.summary.total === 0
         ) {
           this.renderState('empty');
-        } else if (this.reportData.failedTests.length === 0) {
+        } else if (
+          this.reportData.failedTests.length === 0 &&
+          this.reportData.summary.error === 0
+        ) {
           this.renderState('all-passed');
         } else {
           this.renderState('results');

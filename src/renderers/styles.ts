@@ -56,10 +56,41 @@ export function getStyles(): string {
       color: var(--vscode-sideBarSectionHeader-foreground);
     }
 
+    .summary-total {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-sm) 0;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .total-value {
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--vscode-foreground);
+    }
+
+    .total-label {
+      font-size: 11px;
+      color: var(--vscode-descriptionForeground);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: var(--spacing-xs);
+    }
+
     .summary-stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: var(--spacing-sm);
+    }
+
+    /* Responsive: 2 columns when sidebar is narrow */
+    @media (max-width: 300px) {
+      .summary-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     .stat-item {
@@ -104,6 +135,10 @@ export function getStyles(): string {
       color: var(--vscode-testing-iconSkipped, #cca700);
     }
 
+    .stat-error {
+      color: var(--vscode-testing-iconError, #f59e0b);
+    }
+
     .progress-bar {
       display: flex;
       height: 4px;
@@ -120,6 +155,16 @@ export function getStyles(): string {
 
     .progress-failed {
       background: var(--vscode-testing-iconFailed, #f14c4c);
+      transition: width 0.3s ease;
+    }
+
+    .progress-error {
+      background: var(--vscode-testing-iconError, #f59e0b);
+      transition: width 0.3s ease;
+    }
+
+    .progress-skipped {
+      background: var(--vscode-testing-iconSkipped, #cca700);
       transition: width 0.3s ease;
     }
 

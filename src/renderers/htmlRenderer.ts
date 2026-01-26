@@ -150,6 +150,8 @@ export class HtmlRenderer {
     const { summary, tests, failedTests } = reportData;
 
     const passedTests = tests.filter((t) => t.status === 'passed');
+    const failedTestsOnly = tests.filter((t) => t.status === 'failed');
+    const errorTests = tests.filter((t) => t.status === 'error');
     const skippedTests = tests.filter(
       (t) =>
         t.status === 'skipped' ||
@@ -157,13 +159,26 @@ export class HtmlRenderer {
         t.status === 'xpassed'
     );
 
-    const failedSection = this.renderTestSection(
-      'Failed Tests',
-      failedTests,
-      tests,
-      'failed',
-      false
-    );
+    const errorSection =
+      summary.error > 0
+        ? this.renderTestSection(
+            'Error Tests',
+            errorTests,
+            tests,
+            'error',
+            false
+          )
+        : '';
+    const failedSection =
+      summary.failed > 0
+        ? this.renderTestSection(
+            'Failed Tests',
+            failedTestsOnly,
+            tests,
+            'failed',
+            false
+          )
+        : '';
     const passedSection =
       summary.passed > 0
         ? this.renderTestSection(
@@ -188,6 +203,7 @@ export class HtmlRenderer {
     return this.wrapHtml(`
       ${this.renderSummarySection(summary)}
       ${failedSection}
+      ${errorSection}
       ${passedSection}
       ${skippedSection}
     `);
@@ -228,6 +244,18 @@ export class HtmlRenderer {
       summary.total > 0
         ? Math.round((summary.passed / summary.total) * 100)
         : 0;
+    const failRate =
+      summary.total > 0
+        ? Math.round((summary.failed / summary.total) * 100)
+        : 0;
+    const errorRate =
+      summary.total > 0
+        ? Math.round((summary.error / summary.total) * 100)
+        : 0;
+    const skippedRate =
+      summary.total > 0
+        ? Math.round((summary.skipped / summary.total) * 100)
+        : 0;
 
     return `
       <div class="summary-section">
@@ -240,15 +268,11 @@ export class HtmlRenderer {
             </svg>
           </button>
         </div>
+        <div class="summary-total">
+          <span class="total-value">${summary.total}</span>
+          <span class="total-label">Total Tests</span>
+        </div>
         <div class="summary-stats">
-          <div class="stat-item stat-total">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-              <path d="M8 8h8M8 12h8M8 16h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span class="stat-value">${summary.total}</span>
-            <span class="stat-label">Total</span>
-          </div>
           <div class="stat-item stat-passed">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
@@ -265,6 +289,14 @@ export class HtmlRenderer {
             <span class="stat-value">${summary.failed}</span>
             <span class="stat-label">Failed</span>
           </div>
+          <div class="stat-item stat-error">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="stat-value">${summary.error}</span>
+            <span class="stat-label">Error</span>
+          </div>
           <div class="stat-item stat-skipped">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
@@ -279,11 +311,9 @@ export class HtmlRenderer {
             ? `
           <div class="progress-bar">
             <div class="progress-passed" style="width: ${passRate}%"></div>
-            <div class="progress-failed" style="width: ${
-              summary.total > 0
-                ? Math.round((summary.failed / summary.total) * 100)
-                : 0
-            }%"></div>
+            <div class="progress-failed" style="width: ${failRate}%"></div>
+            <div class="progress-error" style="width: ${errorRate}%"></div>
+            <div class="progress-skipped" style="width: ${skippedRate}%"></div>
           </div>
         `
             : ''
@@ -292,7 +322,7 @@ export class HtmlRenderer {
     `;
   }
 
-  // Render a test section (Failed, Passed, Skipped)
+  // Render a test section (Failed, Passed, Skipped, Error)
   static renderTestSection(
     title: string,
     sectionTests: TestResult[],
@@ -342,6 +372,8 @@ export class HtmlRenderer {
       countColor = 'var(--vscode-testing-iconPassed, #4ec9b0)';
     } else if (status === 'skipped') {
       countColor = 'var(--vscode-testing-iconSkipped, #cca700)';
+    } else if (status === 'error') {
+      countColor = 'var(--vscode-testing-iconError, #f59e0b)';
     }
 
     return `
@@ -411,6 +443,12 @@ export class HtmlRenderer {
       iconSvg = `
         <circle cx="12" cy="12" r="10" stroke="${iconColor}" stroke-width="2"/>
         <path d="M15 9l-6 6M9 9l6 6" stroke="${iconColor}" stroke-width="2" stroke-linecap="round"/>
+      `;
+    } else if (status === 'error') {
+      iconColor = 'var(--vscode-testing-iconError, #f59e0b)';
+      iconSvg = `
+        <circle cx="12" cy="12" r="10" stroke="${iconColor}" stroke-width="2"/>
+        <path d="M12 8v4M12 16h.01" stroke="${iconColor}" stroke-width="2" stroke-linecap="round"/>
       `;
     } else if (status === 'passed') {
       iconColor = 'var(--vscode-testing-iconPassed, #4ec9b0)';
