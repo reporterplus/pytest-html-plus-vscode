@@ -14,10 +14,10 @@ export class ReportService {
   private onChangeCallback?: () => void;
 
   // Get all configured reports
- getAllReportPaths(): string[] {
-  const config = vscode.workspace.getConfiguration('reporterplus');
-  return config.get<string[]>('reportJsonPaths') || [];
-}
+  getAllReportPaths(): string[] {
+    const config = vscode.workspace.getConfiguration('reporterplus');
+    return config.get<string[]>('reportJsonPaths') || [];
+  }
 
   // Set active report
   setActiveReport(path: string) {
@@ -25,33 +25,37 @@ export class ReportService {
   }
 
   // Resolve the report path from config or auto-detect
-async resolveReportPath(): Promise<string | null> {
-  const reports = this.getAllReportPaths();
+  async resolveReportPath(): Promise<string | null> {
+  let reports = this.getAllReportPaths();
 
-  if (reports.length > 0) {
-    if (!this.activeReportPath || !reports.includes(this.activeReportPath)) {
-      this.activeReportPath = reports[0];
+  if (reports.length === 0) {
+    const workspace = vscode.workspace.workspaceFolders?.[0];
+    if (workspace) {
+      return await findReportFile(workspace.uri);
     }
-
-    let reportPath = this.activeReportPath;
-
-    if (!reportPath.startsWith('/') && !/^[A-Za-z]:/.test(reportPath)) {
-      const workspace = vscode.workspace.workspaceFolders?.[0];
-      if (workspace) {
-        reportPath = vscode.Uri.joinPath(workspace.uri, reportPath).fsPath;
-      }
-    }
-
-    return reportPath;
+    return null;
   }
 
-  const workspace = vscode.workspace.workspaceFolders?.[0];
-  if (workspace) {
-    return await findReportFile(workspace.uri);
+  // Remove stale paths that no longer exist
+  const validReports = reports.filter((p) => fs.existsSync(p));
+
+  if (validReports.length !== reports.length) {
+    const config = vscode.workspace.getConfiguration("reporterplus");
+    await config.update(
+      "reportJsonPaths",
+      validReports,
+      vscode.ConfigurationTarget.Workspace
+    );
+
+    reports = validReports;
   }
 
-  return null;
-}
+  if (reports.length === 0) {
+    return null;
+  }
+
+    return validReports.includes(this.activeReportPath || '') ? this.activeReportPath! : validReports[0];
+  }
 
   // Load report from file
   async loadReport(reportPath: string): Promise<ReportData> {

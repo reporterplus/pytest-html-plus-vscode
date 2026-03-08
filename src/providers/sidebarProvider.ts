@@ -73,6 +73,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         this.reportService.setActiveReport(msg.path);
         await this.refresh();
         break;
+      case "openConfigureCommand":
+        vscode.commands.executeCommand(
+          "workbench.action.showCommands",
+          "Configure Report Path"
+        );
+        break;
     }
   }
 
