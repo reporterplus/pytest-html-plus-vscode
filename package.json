@@ -38,6 +38,7 @@
         "category": "Pytest HTML Plus",
         "icon": "$(refresh)"
       }
+      
     ],
     "viewsContainers": {
       "activitybar": [
@@ -84,10 +85,13 @@
     "configuration": {
       "title": "Pytest HTML Plus",
       "properties": {
-        "reporterplus.reportJsonPath": {
-          "type": "string",
-          "default": "",
-          "description": "Path to the pytest report JSON file (absolute or relative to workspace). Leave empty for auto-detection."
+        "reporterplus.reportJsonPaths": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "List of pytest-html-plus report JSON files for switching between reports."
         },
         "reporterplus.autoRefresh": {
           "type": "boolean",

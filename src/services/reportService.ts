@@ -10,33 +10,48 @@ export class ReportService {
   private fileWatcher?: fs.FSWatcher;
   private debounceTimer?: NodeJS.Timeout;
   private currentReportPath?: string;
+  private activeReportPath?: string;
   private onChangeCallback?: () => void;
 
-  // Resolve the report path from config or auto-detect
-  async resolveReportPath(): Promise<string | null> {
-    const config = vscode.workspace.getConfiguration('reporterplus');
-    let reportPath = config.get<string>('reportJsonPath');
+  // Get all configured reports
+ getAllReportPaths(): string[] {
+  const config = vscode.workspace.getConfiguration('reporterplus');
+  return config.get<string[]>('reportJsonPaths') || [];
+}
 
-    // If path is configured, use it
-    if (reportPath) {
-      // Resolve relative paths
-      if (!reportPath.startsWith('/') && !/^[A-Za-z]:/.test(reportPath)) {
-        const workspace = vscode.workspace.workspaceFolders?.[0];
-        if (workspace) {
-          reportPath = vscode.Uri.joinPath(workspace.uri, reportPath).fsPath;
-        }
-      }
-      return reportPath;
-    }
-
-    // Auto-detect report file
-    const workspace = vscode.workspace.workspaceFolders?.[0];
-    if (workspace) {
-      return await findReportFile(workspace.uri);
-    }
-
-    return null;
+  // Set active report
+  setActiveReport(path: string) {
+    this.activeReportPath = path;
   }
+
+  // Resolve the report path from config or auto-detect
+async resolveReportPath(): Promise<string | null> {
+  const reports = this.getAllReportPaths();
+
+  if (reports.length > 0) {
+    if (!this.activeReportPath || !reports.includes(this.activeReportPath)) {
+      this.activeReportPath = reports[0];
+    }
+
+    let reportPath = this.activeReportPath;
+
+    if (!reportPath.startsWith('/') && !/^[A-Za-z]:/.test(reportPath)) {
+      const workspace = vscode.workspace.workspaceFolders?.[0];
+      if (workspace) {
+        reportPath = vscode.Uri.joinPath(workspace.uri, reportPath).fsPath;
+      }
+    }
+
+    return reportPath;
+  }
+
+  const workspace = vscode.workspace.workspaceFolders?.[0];
+  if (workspace) {
+    return await findReportFile(workspace.uri);
+  }
+
+  return null;
+}
 
   // Load report from file
   async loadReport(reportPath: string): Promise<ReportData> {
@@ -52,10 +67,10 @@ export class ReportService {
     try {
       this.fileWatcher = fs.watch(reportPath, (eventType) => {
         if (eventType === 'change') {
-          // Debounce rapid changes to prevent multiple updates
           if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
           }
+
           this.debounceTimer = setTimeout(() => {
             this.onChangeCallback?.();
           }, 300);
@@ -66,7 +81,7 @@ export class ReportService {
         this.stopWatching();
       });
     } catch {
-      // File watching not supported or file doesn't exist
+      // File watching not supported
     }
   }
 
@@ -76,10 +91,12 @@ export class ReportService {
       this.fileWatcher.close();
       this.fileWatcher = undefined;
     }
+
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = undefined;
     }
+
     this.onChangeCallback = undefined;
   }
 
@@ -88,7 +105,7 @@ export class ReportService {
     return this.currentReportPath;
   }
 
-  // Dispose resources to free up resources on extension deactivation
+  // Dispose resources
   dispose(): void {
     this.stopWatching();
   }
