@@ -1,4 +1,5 @@
 import { ReportService } from "../src/services/reportService";
+import * as fs from "fs";
 
 jest.mock("vscode", () => ({
   workspace: {
@@ -6,12 +7,26 @@ jest.mock("vscode", () => ({
       get: () => [
         "/reports/run1.json",
         "/reports/run2.json"
-      ]
+      ],
+      update: jest.fn()
     }),
     workspaceFolders: [
       { uri: { fsPath: "/workspace" } }
     ]
+  },
+
+  ConfigurationTarget: {
+    Workspace: 1
+  },
+
+  Uri: {
+    joinPath: (...args: any[]) => ({
+      fsPath: args.join("/")
+    })
   }
+}));
+jest.mock("fs", () => ({
+  existsSync: jest.fn(),
 }));
 
 describe("ReportService", () => {
@@ -32,12 +47,21 @@ describe("ReportService", () => {
     expect((service as any).activeReportPath).toBe("/reports/run2.json");
   });
 
-  test("resolveReportPath should return first report when active not set", async () => {
-    const service = new ReportService();
+  test("should return first valid report when active not set", async () => {
+    jest.spyOn(fs, "existsSync").mockReturnValue(true);
 
+    const service = new ReportService();
     const path = await service.resolveReportPath();
 
     expect(path).toContain("run1.json");
-  });
+});
+  test("should return null when no valid reports exist", async () => {
+  jest.spyOn(fs, "existsSync").mockReturnValue(false);
+
+  const service = new ReportService();
+  const path = await service.resolveReportPath();
+
+  expect(path).toBeNull();
+});
 
 });
