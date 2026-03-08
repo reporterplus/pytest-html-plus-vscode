@@ -38,7 +38,6 @@
         "category": "Pytest HTML Plus",
         "icon": "$(refresh)"
       }
-      
     ],
     "viewsContainers": {
       "activitybar": [
@@ -117,11 +116,15 @@
     "build": "tsc -p .",
     "watch": "tsc -watch -p .",
     "lint": "tsc --noEmit",
-    "package": "vsce package"
+    "package": "vsce package",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.80.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.3"
   }
 }
