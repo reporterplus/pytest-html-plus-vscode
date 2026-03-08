@@ -70,16 +70,24 @@ export class HtmlRenderer {
         toggleEl.querySelector('.toggle-icon').style.transform = 'rotate(180deg)';
       }
     }
-      const selector = document.getElementById('reportSelector');
+      
+    const selector = document.getElementById('reportSelector');
 
-  if (selector) {
-    selector.addEventListener('change', (e) => {
-      vscode.postMessage({
-        command: 'switchReport',
-        path: e.target.value
+    if (selector) {
+      selector.addEventListener('change', (e) => {
+        const value = e.target.value;
+
+        if (value === "__add__") {
+          vscode.postMessage({ command: "configure" });
+          return;
+        }
+
+        vscode.postMessage({
+          command: "switchReport",
+          path: value
+        });
       });
-    });
-  }
+}
   </script>
 </body>
 </html>`;
@@ -144,9 +152,7 @@ export class HtmlRenderer {
   activeReport?: string
 ): string {
 
-  const reportSelector =
-    reports.length > 1
-      ? `
+const reportSelector = `
 <div class="report-selector">
   <select id="reportSelector">
     ${reports
@@ -159,10 +165,11 @@ export class HtmlRenderer {
         }>${label}</option>`;
       })
       .join("")}
+
+    <option value="__add__">➕ Add more reports...</option>
   </select>
 </div>
-`
-      : "";
+`;
 
   return this.wrapHtml(`
       ${reportSelector}
@@ -198,9 +205,7 @@ export class HtmlRenderer {
         t.status === 'xfailed' ||
         t.status === 'xpassed'
     );
-    const reportSelector =
-  reports.length > 1
-    ? `
+    const reportSelector = `
 <div class="report-selector">
   <select id="reportSelector">
     ${reports
@@ -213,10 +218,11 @@ export class HtmlRenderer {
         }>${label}</option>`;
       })
       .join("")}
+
+    <option value="__add__">➕ Add more reports...</option>
   </select>
 </div>
-`
-    : "";
+`;
 
     const errorSection =
       summary.error > 0
