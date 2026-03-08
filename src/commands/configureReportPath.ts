@@ -1,64 +1,76 @@
-/**
- * Command handler for configuring the report path
- */
-import * as vscode from 'vscode';
-import { findReportFile } from '../utils/reportReader';
+import * as vscode from "vscode";
+import { findReportFile } from "../utils/reportReader";
 
 export async function configureReportPath(sidebarProvider: any): Promise<void> {
   const workspace = vscode.workspace.workspaceFolders?.[0];
+
   if (!workspace) {
-    vscode.window.showErrorMessage('No workspace folder open');
+    vscode.window.showErrorMessage("No workspace folder open");
     return;
   }
 
   const choice = await vscode.window.showQuickPick(
     [
       {
-        label: '$(folder-opened) Browse for file...',
-        description: 'Select the report file using file picker',
-        action: 'browse',
+        label: "$(folder-opened) Browse reports...",
+        description: "Select one or more report JSON files",
+        action: "browse",
       },
       {
-        label: '$(edit) Enter path manually',
-        description: 'Type the path to the report file',
-        action: 'manual',
+        label: "$(edit) Enter path manually",
+        description: "Type the path to the report file",
+        action: "manual",
       },
       {
-        label: '$(search) Auto-detect',
-        description: 'Search for report files in the workspace',
-        action: 'auto',
+        label: "$(search) Auto-detect",
+        description: "Search for report files in the workspace",
+        action: "auto",
       },
     ],
     {
-      placeHolder: 'How would you like to configure the report path?',
+      placeHolder: "How would you like to configure reports?",
     }
   );
 
   if (!choice) return;
 
-  let resolvedPath: string | undefined;
+  let paths: string[] = [];
 
-  if (choice.action === 'browse') {
-    const fileUri = await vscode.window.showOpenDialog({
+  // -------------------------
+  // Browse reports
+  // -------------------------
+  if (choice.action === "browse") {
+    const fileUris = await vscode.window.showOpenDialog({
       canSelectFiles: true,
       canSelectFolders: false,
-      canSelectMany: false,
-      openLabel: 'Select Report File',
+      canSelectMany: true,
+      openLabel: "Select Report Files",
       filters: {
-        'JSON files': ['json'],
-        'All files': ['*'],
+        "JSON files": ["json"],
+        "All files": ["*"],
       },
       defaultUri: workspace.uri,
     });
 
-    if (!fileUri || fileUri.length === 0) return;
-    resolvedPath = fileUri[0].fsPath;
-  } else if (choice.action === 'manual') {
+    if (!fileUris || fileUris.length === 0) return;
+
+    const newPaths = fileUris.map((f) => f.fsPath);
+
+    const config = vscode.workspace.getConfiguration("reporterplus");
+    const existing = config.get<string[]>("reportJsonPaths") || [];
+
+    paths = [...new Set([...existing, ...newPaths])];
+  }
+
+  // -------------------------
+  // Manual path input
+  // -------------------------
+  else if (choice.action === "manual") {
     const input = await vscode.window.showInputBox({
-      prompt: 'Enter path to the report JSON file',
-      placeHolder: 'reports/final_report.json or /absolute/path/report.json',
+      prompt: "Enter path to the report JSON file",
+      placeHolder: "reports/final_report.json or /absolute/path/report.json",
       validateInput: (value) => {
-        if (!value.trim()) return 'Path cannot be empty';
+        if (!value.trim()) return "Path cannot be empty";
         return null;
       },
     });
@@ -66,48 +78,42 @@ export async function configureReportPath(sidebarProvider: any): Promise<void> {
     if (!input) return;
 
     let pathToResolve = input.trim();
-    if (!pathToResolve.endsWith('.json')) {
-      pathToResolve = pathToResolve.replace(/\/?$/, '/final_report.json');
+
+    if (!pathToResolve.endsWith(".json")) {
+      pathToResolve = pathToResolve.replace(/\/?$/, "/final_report.json");
     }
 
-    if (pathToResolve.startsWith('/') || /^[A-Za-z]:/.test(pathToResolve)) {
-      resolvedPath = pathToResolve;
-    } else {
-      resolvedPath = vscode.Uri.joinPath(workspace.uri, pathToResolve).fsPath;
+    if (!pathToResolve.startsWith("/") && !/^[A-Za-z]:/.test(pathToResolve)) {
+      pathToResolve = vscode.Uri.joinPath(workspace.uri, pathToResolve).fsPath;
     }
-  } else if (choice.action === 'auto') {
+
+    paths = [pathToResolve];
+  }
+
+  // -------------------------
+  // Auto detect
+  // -------------------------
+  else if (choice.action === "auto") {
     const detected = await findReportFile(workspace.uri);
 
-    if (detected) {
-      const useDetected = await vscode.window.showInformationMessage(
-        `Found report at: ${detected}`,
-        'Use this file',
-        'Cancel'
-      );
-
-      if (useDetected === 'Use this file') {
-        resolvedPath = detected;
-      }
-    } else {
+    if (!detected) {
       vscode.window.showWarningMessage(
-        'No pytest report files found in the workspace. Please configure manually.'
+        "No pytest report files found in the workspace."
       );
       return;
     }
+
+    paths = [detected];
   }
 
-  if (!resolvedPath) return;
+  if (paths.length === 0) return;
 
   await vscode.workspace
-    .getConfiguration('reporterplus')
-    .update(
-      'reportJsonPath',
-      resolvedPath,
-      vscode.ConfigurationTarget.Workspace
-    );
+  .getConfiguration("reporterplus")
+  .update("reportJsonPaths", paths, vscode.ConfigurationTarget.Workspace);
 
   vscode.window.showInformationMessage(
-    `Report path configured: ${resolvedPath}`
+    `${paths.length} report(s) configured`
   );
 
   sidebarProvider?.refresh();

@@ -84,10 +84,13 @@
     "configuration": {
       "title": "Pytest HTML Plus",
       "properties": {
-        "reporterplus.reportJsonPath": {
-          "type": "string",
-          "default": "",
-          "description": "Path to the pytest report JSON file (absolute or relative to workspace). Leave empty for auto-detection."
+        "reporterplus.reportJsonPaths": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "List of pytest-html-plus report JSON files for switching between reports."
         },
         "reporterplus.autoRefresh": {
           "type": "boolean",
@@ -113,11 +116,15 @@
     "build": "tsc -p .",
     "watch": "tsc -watch -p .",
     "lint": "tsc --noEmit",
-    "package": "vsce package"
+    "package": "vsce package",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.80.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.3"
   }
 }

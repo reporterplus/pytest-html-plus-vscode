@@ -1,0 +1,23 @@
+{
+  "filters": {
+    "total": 2,
+    "passed": 2,
+    "skipped": 0
+  },
+  "results": [
+    {
+      "test": "test_login_success",
+      "nodeid": "tests/test_login.py::test_login_success",
+      "status": "passed",
+      "file": "tests/test_login.py",
+      "line": 10
+    },
+    {
+      "test": "test_signup_success",
+      "nodeid": "tests/test_signup.py::test_signup_success",
+      "status": "passed",
+      "file": "tests/test_signup.py",
+      "line": 22
+    }
+  ]
+}
