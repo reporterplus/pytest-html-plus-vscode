@@ -1,12 +1,13 @@
 {
   "name": "pytest-html-plus-vscode",
   "displayName": "Pytest HTML Plus",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "publisher": "reporterplus",
   "description": "View pytest test results in VS Code sidebar with one-click navigation to failures.",
   "categories": [
     "Testing"
   ],
+  "license": "MIT",  
   "keywords": [
     "pytest",
     "python",
