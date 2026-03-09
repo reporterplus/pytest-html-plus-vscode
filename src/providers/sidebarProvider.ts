@@ -41,7 +41,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     // Watch for configuration changes
     vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration('reporterplus.reportJsonPath')) {
+      if (
+        e.affectsConfiguration('reporterplus.reportJsonPath') ||
+        e.affectsConfiguration('reporterplus.reportJsonPaths')
+      ) {
         this.loadReport();
       }
     });
@@ -65,6 +68,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         break;
       case 'copyError':
         this.copyError(msg.index);
+        break;
+      case 'switchReport':
+        this.reportService.setActiveReport(msg.path);
+        await this.refresh();
+        break;
+      case "openConfigureCommand":
+        vscode.commands.executeCommand(
+          "workbench.action.showCommands",
+          "Configure Report Path"
+        );
         break;
     }
   }
@@ -183,13 +196,25 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         this.view.webview.html = HtmlRenderer.renderEmpty();
         break;
       case 'all-passed':
-        this.view.webview.html = HtmlRenderer.renderAllPassed(
-          this.reportData?.summary
-        );
+        if (this.reportData) {
+          const reports = this.reportService.getAllReportPaths();
+
+          this.view.webview.html = HtmlRenderer.renderAllPassed(
+            this.reportData.summary,
+            reports,
+            this.reportService.getCurrentReportPath()
+          );
+        }
         break;
       case 'results':
         if (this.reportData) {
-          this.view.webview.html = HtmlRenderer.renderResults(this.reportData);
+          const reports = this.reportService.getAllReportPaths();
+
+          this.view.webview.html = HtmlRenderer.renderResults(
+            this.reportData,
+            reports,
+            this.reportService.getCurrentReportPath()
+          );
         } else {
           this.view.webview.html = HtmlRenderer.renderEmpty();
         }

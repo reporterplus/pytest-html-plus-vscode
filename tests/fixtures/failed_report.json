@@ -1,0 +1,24 @@
+{
+  "filters": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1
+  },
+  "results": [
+    {
+      "test": "test_login_success",
+      "nodeid": "tests/test_login.py::test_login_success",
+      "status": "passed",
+      "file": "tests/test_login.py",
+      "line": 10
+    },
+    {
+      "test": "test_login_failure",
+      "nodeid": "tests/test_login.py::test_login_failure",
+      "status": "failed",
+      "file": "tests/test_login.py",
+      "line": 30,
+      "stderr": "AssertionError: login failed"
+    }
+  ]
+}

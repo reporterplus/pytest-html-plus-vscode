@@ -1,23 +1,31 @@
 {
   "name": "pytest-html-plus-vscode",
   "displayName": "Pytest HTML Plus",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "publisher": "reporterplus",
-  "description": "View pytest test results in VS Code sidebar with one-click navigation to failures.",
+  "description": "View pytest-html-plus test reports directly in the VS Code sidebar with failure navigation, error previews, auto-detection, and multi-report support.",
   "categories": [
     "Testing"
   ],
+  "license": "MIT",  
   "keywords": [
-    "pytest",
-    "python",
-    "testing",
-    "test results",
-    "pytest-html-plus"
-  ],
+  "pytest",
+  "pytest-html-plus",
+  "python testing",
+  "test runner",
+  "test reports",
+  "test explorer",
+  "pytest report",
+  "automation testing",
+  "qa"
+],
   "icon": "resources/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/reporterplus/pytest-html-plus-vscode"
+    "homepage": "https://github.com/reporterplus/pytest-html-plus-vscode",
+    "bugs": {
+      "url": "https://github.com/reporterplus/pytest-html-plus-vscode/issues"
+    }
   },
   "engines": {
     "vscode": "^1.80.0"
@@ -84,10 +92,13 @@
     "configuration": {
       "title": "Pytest HTML Plus",
       "properties": {
-        "reporterplus.reportJsonPath": {
-          "type": "string",
-          "default": "",
-          "description": "Path to the pytest report JSON file (absolute or relative to workspace). Leave empty for auto-detection."
+        "reporterplus.reportJsonPaths": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Paths to pytest-html-plus report JSON files. Leave empty for automatic detection."
         },
         "reporterplus.autoRefresh": {
           "type": "boolean",
@@ -105,6 +116,10 @@
           "minimum": 50,
           "maximum": 500,
           "description": "Maximum length of error snippets shown in the sidebar."
+        },
+        "galleryBanner": {
+          "color": "#1e1e1e",
+          "theme": "dark"
         }
       }
     }
@@ -113,11 +128,15 @@
     "build": "tsc -p .",
     "watch": "tsc -watch -p .",
     "lint": "tsc --noEmit",
-    "package": "vsce package"
+    "package": "vsce package",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.80.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.3"
   }
 }

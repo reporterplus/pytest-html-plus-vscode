@@ -10,32 +10,51 @@ export class ReportService {
   private fileWatcher?: fs.FSWatcher;
   private debounceTimer?: NodeJS.Timeout;
   private currentReportPath?: string;
+  private activeReportPath?: string;
   private onChangeCallback?: () => void;
+
+  // Get all configured reports
+  getAllReportPaths(): string[] {
+    const config = vscode.workspace.getConfiguration('reporterplus');
+    return config.get<string[]>('reportJsonPaths') || [];
+  }
+
+  // Set active report
+  setActiveReport(path: string) {
+    this.activeReportPath = path;
+  }
 
   // Resolve the report path from config or auto-detect
   async resolveReportPath(): Promise<string | null> {
-    const config = vscode.workspace.getConfiguration('reporterplus');
-    let reportPath = config.get<string>('reportJsonPath');
+  let reports = this.getAllReportPaths();
 
-    // If path is configured, use it
-    if (reportPath) {
-      // Resolve relative paths
-      if (!reportPath.startsWith('/') && !/^[A-Za-z]:/.test(reportPath)) {
-        const workspace = vscode.workspace.workspaceFolders?.[0];
-        if (workspace) {
-          reportPath = vscode.Uri.joinPath(workspace.uri, reportPath).fsPath;
-        }
-      }
-      return reportPath;
-    }
-
-    // Auto-detect report file
+  if (reports.length === 0) {
     const workspace = vscode.workspace.workspaceFolders?.[0];
     if (workspace) {
       return await findReportFile(workspace.uri);
     }
-
     return null;
+  }
+
+  // Remove stale paths that no longer exist
+  const validReports = reports.filter((p) => fs.existsSync(p));
+
+  if (validReports.length !== reports.length) {
+    const config = vscode.workspace.getConfiguration("reporterplus");
+    await config.update(
+      "reportJsonPaths",
+      validReports,
+      vscode.ConfigurationTarget.Workspace
+    );
+
+    reports = validReports;
+  }
+
+  if (reports.length === 0) {
+    return null;
+  }
+
+    return validReports.includes(this.activeReportPath || '') ? this.activeReportPath! : validReports[0];
   }
 
   // Load report from file
@@ -52,10 +71,10 @@ export class ReportService {
     try {
       this.fileWatcher = fs.watch(reportPath, (eventType) => {
         if (eventType === 'change') {
-          // Debounce rapid changes to prevent multiple updates
           if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
           }
+
           this.debounceTimer = setTimeout(() => {
             this.onChangeCallback?.();
           }, 300);
@@ -66,7 +85,7 @@ export class ReportService {
         this.stopWatching();
       });
     } catch {
-      // File watching not supported or file doesn't exist
+      // File watching not supported
     }
   }
 
@@ -76,10 +95,12 @@ export class ReportService {
       this.fileWatcher.close();
       this.fileWatcher = undefined;
     }
+
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = undefined;
     }
+
     this.onChangeCallback = undefined;
   }
 
@@ -88,7 +109,7 @@ export class ReportService {
     return this.currentReportPath;
   }
 
-  // Dispose resources to free up resources on extension deactivation
+  // Dispose resources
   dispose(): void {
     this.stopWatching();
   }

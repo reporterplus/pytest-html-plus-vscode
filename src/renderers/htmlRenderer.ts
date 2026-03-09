@@ -70,6 +70,24 @@ export class HtmlRenderer {
         toggleEl.querySelector('.toggle-icon').style.transform = 'rotate(180deg)';
       }
     }
+      
+    const selector = document.getElementById('reportSelector');
+
+    if (selector) {
+      selector.addEventListener('change', (e) => {
+        const value = e.target.value;
+
+        if (value === "__add__") {
+          vscode.postMessage({ command: "configure" });
+          return;
+        }
+
+        vscode.postMessage({
+          command: "switchReport",
+          path: value
+        });
+      });
+}
   </script>
 </body>
 </html>`;
@@ -128,25 +146,54 @@ export class HtmlRenderer {
     `);
   }
 
-  // Render all passed state
-  static renderAllPassed(summary?: TestSummary): string {
-    return this.wrapHtml(`
+  static renderAllPassed(
+  summary?: TestSummary,
+  reports: string[] = [],
+  activeReport?: string
+): string {
+
+const reportSelector = `
+<div class="report-selector">
+  <select id="reportSelector">
+    ${reports
+      .map((r) => {
+        const parts = r.split(/[\\/]/);
+        const label = parts.slice(-2).join("/");
+
+        return `<option value="${r}" ${
+          r === activeReport ? "selected" : ""
+        }>${label}</option>`;
+      })
+      .join("")}
+
+    <option value="__add__">➕ Add more reports...</option>
+  </select>
+</div>
+`;
+
+  return this.wrapHtml(`
+      ${reportSelector}
       ${this.renderSummarySection(summary)}
+
       <div class="center-content" style="padding-top: 32px;">
         <div class="success-icon">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="var(--vscode-testing-iconPassed)" stroke-width="2"/>
-            <path d="M8 12l2.5 2.5L16 9" stroke="var(--vscode-testing-iconPassed)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 12l2.5 2.5L16 9" stroke="var(--vscode-testing-iconPassed)" stroke-width="2"/>
           </svg>
         </div>
         <h3 class="success-title">All Tests Passed</h3>
         <p class="text-muted">${summary?.total || 0} tests completed successfully</p>
       </div>
-    `);
-  }
+  `);
+}
 
   // Render results with all test sections
-  static renderResults(reportData: ReportData): string {
+  static renderResults(
+  reportData: ReportData,
+  reports: string[] = [],
+  activeReport?: string
+): string {
     const { summary, tests, failedTests } = reportData;
 
     const passedTests = tests.filter((t) => t.status === 'passed');
@@ -158,6 +205,24 @@ export class HtmlRenderer {
         t.status === 'xfailed' ||
         t.status === 'xpassed'
     );
+    const reportSelector = `
+<div class="report-selector">
+  <select id="reportSelector">
+    ${reports
+      .map((r) => {
+        const parts = r.split(/[\\/]/);
+        const label = parts.slice(-2).join("/");
+
+        return `<option value="${r}" ${
+          r === activeReport ? "selected" : ""
+        }>${label}</option>`;
+      })
+      .join("")}
+
+    <option value="__add__">➕ Add more reports...</option>
+  </select>
+</div>
+`;
 
     const errorSection =
       summary.error > 0
@@ -201,12 +266,13 @@ export class HtmlRenderer {
         : '';
 
     return this.wrapHtml(`
+      ${reportSelector}
       ${this.renderSummarySection(summary)}
       ${failedSection}
       ${errorSection}
       ${passedSection}
       ${skippedSection}
-    `);
+`);
   }
 
   // Render error state

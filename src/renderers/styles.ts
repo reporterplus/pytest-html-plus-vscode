@@ -543,10 +543,34 @@ export function getStyles(): string {
       animation: spin 0.8s linear infinite;
       margin-bottom: var(--spacing-lg);
     }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+      /* Report selector dropdown */
+    .report-selector {
+      display: flex;
+      justify-content: center;
+      padding: var(--spacing-sm) var(--spacing-lg);
+      border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border, var(--vscode-panel-border));
     }
+
+    .report-selector select {
+      width: 90%;
+      padding: 4px 6px;
+      border-radius: var(--radius-sm);
+      font-family: var(--vscode-font-family);
+      font-size: 12px;
+
+      background: var(--vscode-dropdown-background);
+      color: var(--vscode-dropdown-foreground);
+      border: 1px solid var(--vscode-dropdown-border);
+    }
+
+    .report-selector select:focus {
+      outline: none;
+      border-color: var(--vscode-focusBorder);
+    }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
 
     /* Scrollbar */
     ::-webkit-scrollbar {
